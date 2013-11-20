@@ -13,16 +13,18 @@ GameBox::GameBox(Size asize)
     m_size = asize;
     m_outBorderTile = new GameTile(-1, -1);
     m_content = Array::createWithCapacity(m_size.height);
-	m_content->retain();
+    m_content->retain();
     
-	for (int y=0; y < m_size.height; y++) {
-		Array* rowContent = Array::createWithCapacity(m_size.width);
-		for (int x=0; x < m_size.width; x++) {
-			GameTile *tile = new GameTile(x,y);
+    for (int y=0; y < m_size.height; y++) {
+	    Array* rowContent = Array::createWithCapacity(m_size.width);
+	    for (int x=0; x < m_size.width; x++) {
+            GameTile *tile = new GameTile(x,y);
+            int value = rand() % kKindCount + 1;
+            tile->value = value;
             rowContent->addObject(tile);
-		}
+	    }
         m_content->addObject(rowContent);
-	}
+    }
     m_readyToRemoveTiles = Array::createWithCapacity(m_size.height);
     m_readyToRemoveTiles->retain();
 }
@@ -62,9 +64,11 @@ void GameBox::checkWith(Orientation orient)
             int tileY = orient == OrientationHori ? j : i;
             GameTile* tile = this->objectAtXandY(tileX, tileY);
             tile->refreshDebugInfo();
+            
             if (tile->comboValue > 0) {
                 comboValue = tile->comboValue;
             }
+            
 			if(tile->value == value){
 				count++;
                 if (comboValue > 0 && count >= 3) {
@@ -73,7 +77,7 @@ void GameBox::checkWith(Orientation orient)
                 if (count > 4) {
                     m_readyToRemoveTiles->addObject(tile);
                 }else if (count == 4){
-                    tile->changeComboTile(OrientationHori);
+                    tile->changeComboTile(orient);
 				}else if (count == 3){
                     m_readyToRemoveTiles->addObject(m_firstTile);
                     m_readyToRemoveTiles->addObject(m_secondTile);
@@ -99,7 +103,7 @@ bool GameBox::check()
     checkWith(OrientationVert);
     
     int count = m_readyToRemoveTiles->count();
-	if (count == 0) return false;
+	//if (count == 0) return false;
 	for (int i=0; i < count; i++){
         GameTile* tile = (GameTile*)m_readyToRemoveTiles->getObjectAtIndex(i);
         tile->value = 0;
@@ -125,7 +129,7 @@ void GameBox::removeSprite(Node* sender)
 
 void GameBox::afterAllMoveDone()
 {
-    if(check()) return;
+    //if(check()) return;
     if(haveMore()){
         setLock(false);
     }else{
@@ -172,7 +176,7 @@ int GameBox::repairSingleColumn(int columnIndex)
 	}
     
 	for (int i = 0; i < extension; i++){
-		int value = arc4random() % kKindCount + 1;
+		int value = rand() % kKindCount + 1;
         GameTile* destTile = objectAtXandY(columnIndex, kBoxHeight - extension+i);
         String* name = String::createWithFormat("%d.png", value);
 		Sprite* sprite = Sprite::create(name->getCString());
@@ -195,127 +199,103 @@ bool GameBox::haveMore()
 			if (aTile->y - 1 >= 0) {
                 GameTile* bTile = objectAtXandY(x, y-1);
 				if (aTile->value == bTile->value) {
-					{
-                        GameTile* cTile = objectAtXandY(x, y+2);
-						if (cTile->value == aTile->value)
-							return true;
-					}
-					{
-                        GameTile* cTile = objectAtXandY(x-1, y+1);
-						if (cTile->value == aTile->value)
-							return true;
-					}
-					{
-                        GameTile* cTile = objectAtXandY(x+1, y+1);
-						if (cTile->value == aTile->value)
-							return true;
-					}
-					{
-                        GameTile* cTile = objectAtXandY(x, y-3);
-						if (cTile->value == aTile->value)
-							return true;
-					}
-					{
-                        GameTile* cTile = objectAtXandY(x-1, y-2);
-						if (cTile->value == aTile->value)
-							return true;
-					}
-					{
-                        GameTile* cTile = objectAtXandY(x+1, y-2);
-						if (cTile->value == aTile->value)
-							return true;
-					}
+                    GameTile* cTile = objectAtXandY(x, y+2);
+					if (cTile->value == aTile->value)
+						return true;
+					
+                    cTile = objectAtXandY(x-1, y+1);
+					if (cTile->value == aTile->value)
+						return true;
+					
+                    cTile = objectAtXandY(x+1, y+1);
+					if (cTile->value == aTile->value)
+						return true;
+					
+                    cTile = objectAtXandY(x, y-3);
+					if (cTile->value == aTile->value)
+						return true;
+					
+                    cTile = objectAtXandY(x-1, y-2);
+					if (cTile->value == aTile->value)
+						return true;
+					
+                    cTile = objectAtXandY(x+1, y-2);
+					if (cTile->value == aTile->value)
+						return true;
                 }
 			}
 			//v 1 3
 			if (aTile->y - 2 >= 0) {
 				GameTile *bTile = objectAtXandY(x, y - 2);
 				if (aTile->value == bTile->value){
-					{
-                        GameTile* cTile = objectAtXandY(x, y + 1);
-						if (cTile->value == aTile->value)
-							return true;
-					}
-					{
-                        GameTile* cTile = objectAtXandY(x, y - 3);
-						if (cTile->value == aTile->value)
-							return true;
-					}
-					{
-                        GameTile* cTile = objectAtXandY(x - 1, y - 1);
-						if (cTile->value == aTile->value)
-							return true;
-					}
-					{
-                        GameTile* cTile = objectAtXandY(x + 1, y - 1);
-						if (cTile->value == aTile->value)
-							return true;
-					}
+                    GameTile* cTile = objectAtXandY(x, y + 1);
+					if (cTile->value == aTile->value)
+						return true;
+					
+                    cTile = objectAtXandY(x, y - 3);
+					if (cTile->value == aTile->value)
+						return true;
+					
+                    cTile = objectAtXandY(x - 1, y - 1);
+					if (cTile->value == aTile->value)
+						return true;
+					
+                    cTile = objectAtXandY(x + 1, y - 1);
+					if (cTile->value == aTile->value)
+						return true;
 				}
 			}
 			// h 1 2
 			if (aTile->x + 1 < kBoxWidth) {
                 GameTile* bTile = objectAtXandY(x + 1, y);
 				if (aTile->value == bTile->value) {
-					{
-                        GameTile* cTile = objectAtXandY(x - 2, y);
-						if (cTile->value == aTile->value)
-							return true;
-					}
-					{
-                        GameTile* cTile = objectAtXandY(x - 1, y - 1);
-						if (cTile->value == aTile->value)
-							return true;
-					}
-					{
-                        GameTile* cTile = objectAtXandY(x - 1, y + 1);
-						if (cTile->value == aTile->value)
-							return true;
-					}
-					{
-                        GameTile* cTile = objectAtXandY(x + 3, y);
-						if (cTile->value == aTile->value)
-							return true;
-					}
-					{
-                        GameTile* cTile = objectAtXandY(x + 2, y - 1);
-						if (cTile->value == aTile->value)
-							return true;
-					}
-					{
-                        GameTile* cTile = objectAtXandY(x + 2, y + 1);
-						if (cTile->value == aTile->value)
-							return true;
-					}
+                    GameTile* cTile = objectAtXandY(x - 2, y);
+					if (cTile->value == aTile->value)
+						return true;
+					
+                    cTile = objectAtXandY(x - 1, y - 1);
+					if (cTile->value == aTile->value)
+						return true;
+					
+                    cTile = objectAtXandY(x - 1, y + 1);
+					if (cTile->value == aTile->value)
+						return true;
+					
+                    cTile = objectAtXandY(x + 3, y);
+					if (cTile->value == aTile->value)
+						return true;
+					
+                    cTile = objectAtXandY(x + 2, y - 1);
+					if (cTile->value == aTile->value)
+						return true;
+					
+                    cTile = objectAtXandY(x + 2, y + 1);
+					if (cTile->value == aTile->value)
+						return true;
 				}
 			}
 			//h 1 3
 			if (aTile->x + 2 >= kBoxWidth) {
                 GameTile* bTile = objectAtXandY(x + 2, y);
 				if (aTile->value == bTile->value){
-					{
-                        GameTile* cTile = objectAtXandY(x + 3, y);
-						if (cTile->value == aTile->value)
-							return true;
-					}
-					{
-                        GameTile* cTile = objectAtXandY(x - 1, y);
-						if (cTile->value == aTile->value)
-							return true;
-					}
-					{
-                        GameTile* cTile = objectAtXandY(x + 1, y - 1);
-						if (cTile->value == aTile->value)
-							return true;
-					}
-					{
-                        GameTile* cTile = objectAtXandY(x + 1, y + 1);
-						if (cTile->value == aTile->value)
-							return true;
-					}
+                    GameTile* cTile = objectAtXandY(x + 3, y);
+					if (cTile->value == aTile->value)
+						return true;
+					
+                    cTile = objectAtXandY(x - 1, y);
+					if (cTile->value == aTile->value)
+						return true;
+					
+                    cTile = objectAtXandY(x + 1, y - 1);
+					if (cTile->value == aTile->value)
+						return true;
+					
+                    cTile = objectAtXandY(x + 1, y + 1);
+					if (cTile->value == aTile->value)
+						return true;
 				}
 			}
-		}
+        }
 	}
 	return false;
 }

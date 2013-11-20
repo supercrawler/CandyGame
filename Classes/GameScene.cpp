@@ -21,6 +21,7 @@ bool GameScene::init()
     if (!Layer::init()){
         return false;
     }
+    m_selectedTile = NULL;
     initData();
     return true;
 }
@@ -32,20 +33,27 @@ void GameScene::initData()
     auto mapBg = Sprite::create("map.png");
     mapBg->setPosition(Point(visibleSize.width * .5 + origin.x, visibleSize.height * .5 + origin.y));
     this->addChild(mapBg);
-    
-    
-    
+
     auto listener = EventListenerTouch::create(Touch::DispatchMode::ONE_BY_ONE);
     listener->onTouchBegan = CC_CALLBACK_2(GameScene::onTouchBegan, this);
     
     EventDispatcher::getInstance()->addEventListenerWithSceneGraphPriority(listener, this);
-    
-    
-    
-    
+
     m_box = new GameBox(Size(kBoxWidth, kBoxHeight));
     m_box->layer = this;
     m_box->setLock(true);
+    
+    for (int i=0; i< kBoxWidth; i++) {
+        for (int j=0; j< kBoxHeight; j++) {
+            GameTile* tile = m_box->objectAtXandY(i, j);
+            String* name = String::createWithFormat("%d.png", tile->value);
+            Sprite* sprite = Sprite::create(name->getCString());
+            sprite->setPosition(Point(kStartX + i * kTileSize + kTileSize * .5, kStartY + j * kTileSize + kTileSize * .5));
+            tile->sprite = sprite;
+            this->addChild(sprite);
+        }
+    }
+
 }
 
 void GameScene::onEnterTransitionDidFinish()

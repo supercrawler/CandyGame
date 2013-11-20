@@ -18,18 +18,21 @@ class GameScene : public cocos2d::Layer
 {
 public:
     static cocos2d::Scene* createScene();
-    virtual bool init();
-    CREATE_FUNC(GameScene);
+   
     void changeWithTileABandSel(GameTile* a, GameTile* b, SEL_CallFuncND sel);
     void checkSenderandData(Node* sender, void* data);
     void backcheckSenderandData(Node* sender, void* data);
-    void onEnterTransitionDidFinish();
     void afterOneShineTrun(Node* sprite);
     
-    virtual bool onTouchBegan(Touch *touch, Event * event);
-    virtual void onTouchEnded(Touch *touch, Event * event);
-    virtual void onTouchCancelled(Touch *touch, Event * event);
-    virtual void onTouchMoved(Touch *touch, Event * event);
+    //Override
+    virtual bool init() override; 
+    virtual void onEnterTransitionDidFinish() override;
+    virtual bool onTouchBegan(Touch *touch, Event * event) override;
+    virtual void onTouchEnded(Touch *touch, Event * event) override;
+    virtual void onTouchCancelled(Touch *touch, Event * event) override;
+    virtual void onTouchMoved(Touch *touch, Event * event) override;
+
+    CREATE_FUNC(GameScene);
     
 private:
 	GameBox* m_box;

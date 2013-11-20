@@ -66,7 +66,7 @@ Point GameTile::pixPosition()
 
 void GameTile::refreshDebugInfo()
 {
-    if (true or !sprite) return;
+    if (true || !sprite) return;
     sprite->removeAllChildrenWithCleanup(true);
     
     auto labValue = LabelTTF::create(String::createWithFormat("%d-%d", value, comboValue)->getCString(), "Arial", 40);
