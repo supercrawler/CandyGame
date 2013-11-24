@@ -42,7 +42,8 @@ void GameScene::initData()
     m_box = new GameBox(Size(kBoxWidth, kBoxHeight));
     m_box->layer = this;
     m_box->setLock(true);
-    
+                          
+    //fill screen sprite
     for (int i=0; i< kBoxWidth; i++) {
         for (int j=0; j< kBoxHeight; j++) {
             GameTile* tile = m_box->objectAtXandY(i, j);

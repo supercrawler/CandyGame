@@ -1,3 +1,5 @@
 Debug.win32
-proj.ios_mac
-HelloCpp.xcodeproj
+bin/
+obj/
+HelloCpp.sdf
+libs/

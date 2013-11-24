@@ -103,7 +103,7 @@ bool GameBox::check()
     checkWith(OrientationVert);
     
     int count = m_readyToRemoveTiles->count();
-	//if (count == 0) return false;
+	if (count == 0) return false;
 	for (int i=0; i < count; i++){
         GameTile* tile = (GameTile*)m_readyToRemoveTiles->getObjectAtIndex(i);
         tile->value = 0;
