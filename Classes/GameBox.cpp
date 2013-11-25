@@ -29,7 +29,7 @@ GameBox::GameBox(Size asize)
     m_readyToRemoveTiles->retain();
 }
 
-GameTile* GameBox::objectAtXandY(int posX,int posY)
+GameTile* GameBox::objectAtXandY(int posX, int posY)
 {
 	if (posX < 0 || posX >= kBoxWidth || posY < 0 || posY >= kBoxHeight){
         return m_outBorderTile;
@@ -39,13 +39,20 @@ GameTile* GameBox::objectAtXandY(int posX,int posY)
 
 void GameBox::useCombo(int posX, int posY, int comboValue)
 {
-    int iMax = (comboValue == 1) ? m_size.width : m_size.height;
-    for (int i = 0; i < iMax; i++) {
-		int tileX = comboValue == 1 ? i : posY;
-        int tileY = comboValue == 1 ? posY : i;
-        GameTile* tile = this->objectAtXandY(tileX, tileY);
-        m_readyToRemoveTiles->addObject(tile);
+    if (comboValue == 1) {
+        //horizontal 
+        for (int i = 0; i < m_size.width; i++) {
+            GameTile* tile = this->objectAtXandY(i, posY);
+            m_readyToRemoveTiles->addObject(tile);
+        }
+    } else {
+        //vertical
+        for (int j = 0; j < m_size.height; j++) {
+            GameTile* tile = this->objectAtXandY(posX, j);
+            m_readyToRemoveTiles->addObject(tile);
+        }
     }
+   
 }
 
 void GameBox::checkWith(Orientation orient)
@@ -65,15 +72,19 @@ void GameBox::checkWith(Orientation orient)
             GameTile* tile = this->objectAtXandY(tileX, tileY);
             tile->refreshDebugInfo();
             
-            if (tile->comboValue > 0) {
-                comboValue = tile->comboValue;
-            }
-            
 			if(tile->value == value){
-				count++;
+                count++;
+
+				if (tile->comboValue > 0) {
+                    comboValue = tile->comboValue;
+                }
+
                 if (comboValue > 0 && count >= 3) {
                     useCombo(tileX, tileY, comboValue);
+                    continue;
                 }
+
+                //TODO need to optimize the region code for blast logic.
                 if (count > 4) {
                     m_readyToRemoveTiles->addObject(tile);
                 }else if (count == 4){
