@@ -122,11 +122,11 @@ void GameScene::checkSenderandData(Node* sender,void* data)
 		m_firstOne = (GameTile*)data;
 		return;
 	}
+
 	bool result = m_box->check();
 	if (result){
         m_box->setLock(false);
-    }
-	else{
+    }else{
         changeWithTileABandSel((GameTile*)data, m_firstOne, callfuncND_selector(GameScene::backcheckSenderandData));
 	}
     m_firstOne = NULL;
