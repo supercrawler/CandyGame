@@ -14,7 +14,7 @@ GameBox::GameBox(Size asize)
     m_outBorderTile = new GameTile(-1, -1);
     m_content = Array::createWithCapacity(m_size.height);
     m_content->retain();
-    
+
     for (int y=0; y < m_size.height; y++) {
 	    Array* rowContent = Array::createWithCapacity(m_size.width);
 	    for (int x=0; x < m_size.width; x++) {
@@ -40,7 +40,7 @@ GameTile* GameBox::objectAtXandY(int posX, int posY)
 void GameBox::useCombo(int posX, int posY, int comboValue)
 {
     if (comboValue == 1) {
-        //horizontal 
+        //horizontal
         for (int i = 0; i < m_size.width; i++) {
             GameTile* tile = this->objectAtXandY(i, posY);
             m_readyToRemoveTiles->addObject(tile);
@@ -52,32 +52,33 @@ void GameBox::useCombo(int posX, int posY, int comboValue)
             m_readyToRemoveTiles->addObject(tile);
         }
     }
-   
+
 }
 
 void GameBox::checkWith(Orientation orient)
 {
 	int iMax = (orient == OrientationHori) ? m_size.width : m_size.height;
 	int jMax = (orient == OrientationHori) ? m_size.height : m_size.width;
-    
+
 	for (int i = 0; i < iMax; i++) {
-		int count = 0;
-		int value = -1;
+        int count = 0;
+        int value = -1;
         int comboValue = -1;
         m_firstTile = NULL;
         m_secondTile = NULL;
-		for (int j = 0; j < jMax; j++){
+
+        for (int j = 0; j < jMax; j++){
             int tileX = orient == OrientationHori ? i : j;
             int tileY = orient == OrientationHori ? j : i;
             GameTile* tile = this->objectAtXandY(tileX, tileY);
             tile->refreshDebugInfo();
-            
-			if(tile->value == value){
-                count++;
 
-				if (tile->comboValue > 0) {
-                    comboValue = tile->comboValue;
-                }
+            if (tile->comboValue > 0) {
+                comboValue = tile->comboValue;
+            }
+
+            if(tile->value == value){
+                count++;
 
                 if (comboValue > 0 && count >= 3) {
                     useCombo(tileX, tileY, comboValue);
@@ -89,7 +90,7 @@ void GameBox::checkWith(Orientation orient)
                     m_readyToRemoveTiles->addObject(tile);
                 }else if (count == 4){
                     tile->changeComboTile(orient);
-				}else if (count == 3){
+                }else if (count == 3){
                     m_readyToRemoveTiles->addObject(m_firstTile);
                     m_readyToRemoveTiles->addObject(m_secondTile);
                     m_readyToRemoveTiles->addObject(tile);
@@ -98,13 +99,15 @@ void GameBox::checkWith(Orientation orient)
                 }else if (count == 2) {
                     m_secondTile = tile;
                 }
-			}else{
-				count = 1;
-				m_firstTile = tile;
+
+            }else{
+                count = 1;
+                m_firstTile = tile;
                 m_secondTile = NULL;
-				value = tile->value;
-			}
-		}
+                value = tile->value;
+            }
+
+         }
 	}
 }
 
@@ -112,7 +115,7 @@ bool GameBox::check()
 {
     checkWith(OrientationHori);
     checkWith(OrientationVert);
-    
+
     int count = m_readyToRemoveTiles->count();
 	if (count == 0) return false;
 	for (int i=0; i < count; i++){
@@ -122,10 +125,10 @@ bool GameBox::check()
             tile->sprite->runAction(Sequence::createWithTwoActions(ScaleTo::create(.3f, 0.0f), CallFuncN::create(CC_CALLBACK_1(GameBox::removeSprite, this))));
 		}
 	}
-    
+
     m_readyToRemoveTiles->removeAllObjects();
     int maxCount = this->repair();
-    
+
     layer->runAction(Sequence::create(DelayTime::create(kMoveTileTime * maxCount + 0.03f),
                                         CallFunc::create(CC_CALLBACK_0(GameBox::afterAllMoveDone, this)),
                                         NULL));
@@ -144,7 +147,7 @@ void GameBox::afterAllMoveDone()
     if(haveMore()){
         setLock(false);
     }else{
-        for (int y=0; y< kBoxHeight; y++) {
+        for (int y=0; y < kBoxHeight; y++) {
             for (int x=0; x< kBoxWidth; x++) {
                 GameTile* tile = objectAtXandY(x, y);
                 tile->value = 0;
@@ -152,7 +155,7 @@ void GameBox::afterAllMoveDone()
         }
         check();
     }
-    
+
 }
 
 int GameBox::repair()
@@ -175,7 +178,7 @@ int GameBox::repairSingleColumn(int columnIndex)
         if(tile->value == 0)
             extension++;
         else if (extension == 0){
-        
+            
         }else{
             GameTile* destTile = objectAtXandY(columnIndex, y - extension);
             tile->sprite->stopAllActions();
@@ -184,16 +187,17 @@ int GameBox::repairSingleColumn(int columnIndex)
             destTile->sprite = tile->sprite;
             destTile->comboValue = tile->comboValue;
         }
+
 	}
-    
+
 	for (int i = 0; i < extension; i++){
 		int value = rand() % kKindCount + 1;
-        GameTile* destTile = objectAtXandY(columnIndex, kBoxHeight - extension+i);
+        GameTile* destTile = objectAtXandY(columnIndex, kBoxHeight - extension + i);
         String* name = String::createWithFormat("%d.png", value);
 		Sprite* sprite = Sprite::create(name->getCString());
 		sprite->setPosition(Point(kStartX + columnIndex * kTileSize + kTileSize * .5, kStartY + (kBoxHeight + i) * kTileSize + kTileSize * .5));
         layer->addChild(sprite);
-        sprite->runAction(MoveBy::create(kMoveTileTime * extension, Point(0, -kTileSize*extension)));
+        sprite->runAction(MoveBy::create(kMoveTileTime * extension, Point(0, -kTileSize * extension)));
 		destTile->value = value;
         destTile->comboValue = 0;
 		destTile->sprite = sprite;
@@ -213,23 +217,23 @@ bool GameBox::haveMore()
                     GameTile* cTile = objectAtXandY(x, y+2);
 					if (cTile->value == aTile->value)
 						return true;
-					
+
                     cTile = objectAtXandY(x-1, y+1);
 					if (cTile->value == aTile->value)
 						return true;
-					
+
                     cTile = objectAtXandY(x+1, y+1);
 					if (cTile->value == aTile->value)
 						return true;
-					
+
                     cTile = objectAtXandY(x, y-3);
 					if (cTile->value == aTile->value)
 						return true;
-					
+
                     cTile = objectAtXandY(x-1, y-2);
 					if (cTile->value == aTile->value)
 						return true;
-					
+
                     cTile = objectAtXandY(x+1, y-2);
 					if (cTile->value == aTile->value)
 						return true;
@@ -242,15 +246,15 @@ bool GameBox::haveMore()
                     GameTile* cTile = objectAtXandY(x, y + 1);
 					if (cTile->value == aTile->value)
 						return true;
-					
+
                     cTile = objectAtXandY(x, y - 3);
 					if (cTile->value == aTile->value)
 						return true;
-					
+
                     cTile = objectAtXandY(x - 1, y - 1);
 					if (cTile->value == aTile->value)
 						return true;
-					
+
                     cTile = objectAtXandY(x + 1, y - 1);
 					if (cTile->value == aTile->value)
 						return true;
@@ -263,23 +267,23 @@ bool GameBox::haveMore()
                     GameTile* cTile = objectAtXandY(x - 2, y);
 					if (cTile->value == aTile->value)
 						return true;
-					
+
                     cTile = objectAtXandY(x - 1, y - 1);
 					if (cTile->value == aTile->value)
 						return true;
-					
+
                     cTile = objectAtXandY(x - 1, y + 1);
 					if (cTile->value == aTile->value)
 						return true;
-					
+
                     cTile = objectAtXandY(x + 3, y);
 					if (cTile->value == aTile->value)
 						return true;
-					
+
                     cTile = objectAtXandY(x + 2, y - 1);
 					if (cTile->value == aTile->value)
 						return true;
-					
+
                     cTile = objectAtXandY(x + 2, y + 1);
 					if (cTile->value == aTile->value)
 						return true;
@@ -292,15 +296,15 @@ bool GameBox::haveMore()
                     GameTile* cTile = objectAtXandY(x + 3, y);
 					if (cTile->value == aTile->value)
 						return true;
-					
+
                     cTile = objectAtXandY(x - 1, y);
 					if (cTile->value == aTile->value)
 						return true;
-					
+
                     cTile = objectAtXandY(x + 1, y - 1);
 					if (cTile->value == aTile->value)
 						return true;
-					
+
                     cTile = objectAtXandY(x + 1, y + 1);
 					if (cTile->value == aTile->value)
 						return true;

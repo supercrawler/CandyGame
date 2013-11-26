@@ -30,7 +30,7 @@ void GameScene::initData()
 {
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Point origin = Director::getInstance()->getVisibleOrigin();
-    auto mapBg = Sprite::create("map.png");
+    auto mapBg = Sprite::create(s_MainBackgroundResourceId);
     mapBg->setPosition(Point(visibleSize.width * .5 + origin.x, visibleSize.height * .5 + origin.y));
     this->addChild(mapBg);
 

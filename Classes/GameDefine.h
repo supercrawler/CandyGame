@@ -9,13 +9,19 @@
 #ifndef HelloCpp_GameDefine_h
 #define HelloCpp_GameDefine_h
 
-#define kTileSize 95.0f
+//define some const variable.
+#define kTileSize 90.0f
 #define kMoveTileTime 0.2f
-#define kBoxWidth 8
+#define kBoxWidth 5
 #define kBoxHeight 8
-#define kStartX 40
-#define kStartY 230
+#define kStartX 10
+#define kStartY 10
 #define kKindCount 6
+#define kDesignWidth 480
+#define kDesignHeight 800
+
+//define resource id
+static const char s_MainBackgroundResourceId[]         = "main_bg.jpg";
 
 enum Orientation{
 	OrientationHori,
