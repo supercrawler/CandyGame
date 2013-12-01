@@ -56,12 +56,14 @@ void GameTile::changeComboTile(int orient)
         comboValue = 2;
         name = String::createWithFormat("%d_3.png", value);
     }
-    sprite->setDisplayFrame(SpriteFrame::create(name->getCString(), Rect(0, 0, 90, 90)));
+    sprite->setDisplayFrame(SpriteFrame::create(name->getCString(), 
+        Rect(0, 0, kTileSize, kTileSize)));
+    sprite->setScale(kSpriteScale);
 }
 
 Point GameTile::pixPosition()
 {
-	return Point(kStartX + x * kTileSize +kTileSize/2.0f,kStartY + y * kTileSize +kTileSize/2.0f);
+	return Point(kStartX + x * kTileSize + kTileSize/2.0f, kStartY + y * kTileSize +kTileSize/2.0f);
 }
 
 void GameTile::refreshDebugInfo()

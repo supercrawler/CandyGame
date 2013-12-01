@@ -1,14 +1,12 @@
 //
 //  GameBox.cpp
 //  HelloCpp
-//
-//  Created by LiuYanghui on 13-11-1.
-//
-//
 
 #include "GameBox.h"
+#include "SpriteFactory.h"
 
-GameBox::GameBox(Size asize)
+GameBox::GameBox(Size asize):
+    mClearSpriteNum(0)
 {
     m_size = asize;
     m_outBorderTile = new GameTile(-1, -1);
@@ -123,8 +121,21 @@ bool GameBox::check()
         tile->value = 0;
 		if (tile->sprite){
             tile->sprite->runAction(Sequence::createWithTwoActions(ScaleTo::create(.3f, 0.0f), CallFuncN::create(CC_CALLBACK_1(GameBox::removeSprite, this))));
-		}
+		
+            //TODO per sprite score
+            auto labValue = LabelTTF::create(String::createWithFormat("%d", 10)->getCString(), "Arial", 20);
+            labValue->setColor(Color3B(255, 255, 255));
+            labValue->setPosition(tile->pixPosition());
+            layer->addChild(labValue, 2);
+            labValue->runAction(Sequence::create(FadeIn::create(0.5f), 
+                Show::create(),
+                MoveBy::create(0.5f, Point(0, 40)),
+                FadeOut::create(1.5f), 
+                NULL));
+        }
 	}
+    //TODO calculate score
+    mClearSpriteNum += count;
 
     m_readyToRemoveTiles->removeAllObjects();
     int maxCount = this->repair();
@@ -141,6 +152,12 @@ void GameBox::removeSprite(Node* sender)
     layer->removeChild(tile, true);
 }
 
+void GameBox::removeScoreLabelCallback(Node* sender)
+{
+    LabelTTF* label = (LabelTTF*)sender;
+    layer->removeChild(label);
+}
+
 void GameBox::afterAllMoveDone()
 {
     //if(check()) return;
@@ -155,7 +172,6 @@ void GameBox::afterAllMoveDone()
         }
         check();
     }
-
 }
 
 int GameBox::repair()
@@ -193,14 +209,14 @@ int GameBox::repairSingleColumn(int columnIndex)
 	for (int i = 0; i < extension; i++){
 		int value = rand() % kKindCount + 1;
         GameTile* destTile = objectAtXandY(columnIndex, kBoxHeight - extension + i);
-        String* name = String::createWithFormat("%d.png", value);
-		Sprite* sprite = Sprite::create(name->getCString());
-		sprite->setPosition(Point(kStartX + columnIndex * kTileSize + kTileSize * .5, kStartY + (kBoxHeight + i) * kTileSize + kTileSize * .5));
-        layer->addChild(sprite);
-        sprite->runAction(MoveBy::create(kMoveTileTime * extension, Point(0, -kTileSize * extension)));
+        Sprite* sprite = SpriteFactory::getInstance()->create(value, 
+            kStartX + columnIndex * kTileSize + kTileSize * .5, 
+            kStartY + (kBoxHeight + i) * kTileSize + kTileSize * .5);
 		destTile->value = value;
         destTile->comboValue = 0;
 		destTile->sprite = sprite;
+        layer->addChild(sprite);
+        sprite->runAction(MoveBy::create(kMoveTileTime * extension, Point(0, -kTileSize * extension)));
 	}
 	return extension;
 }
@@ -313,4 +329,9 @@ bool GameBox::haveMore()
         }
 	}
 	return false;
+}
+
+int GameBox::getClearSpriteNum()
+{
+    return mClearSpriteNum;
 }

@@ -1,4 +1,5 @@
 #include "HelpGameScene.h"
+#include "GameDefine.h"
 
 USING_NS_CC;
 
@@ -37,9 +38,27 @@ bool HelpGameScene::init()
         return false;
     }
 
+    return true;
+}
+
+void HelpGameScene::onEnter()
+{
+    Layer::onEnter();
+
     Size visibleSize = Director::getInstance()->getVisibleSize();
     Point origin = Director::getInstance()->getVisibleOrigin();
 
+    auto mapBg = Sprite::create(s_MainBackgroundResourceId);
+    mapBg->setPosition(Point(visibleSize.width * .5 + origin.x, visibleSize.height * .5 + origin.y));
+    this->addChild(mapBg);
 
-    return true;
+    auto labValue = LabelTTF::create(String::create("Game Help....")->getCString(), "Arial", 30);
+    labValue->setColor(Color3B(77, 77, 77));
+    labValue->setPosition(Point(visibleSize.width /2.0f + origin.x, visibleSize.height/ 2.0f + origin.y));
+    this->addChild(labValue);
+}
+
+void HelpGameScene::onExit()
+{
+    Layer::onExit();
 }

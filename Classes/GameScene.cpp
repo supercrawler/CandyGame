@@ -1,12 +1,6 @@
-//
-//  GameScene.cpp
-//  HelloCpp
-//
-//  Created by LiuYanghui on 13-11-1.
-//
-//
 
 #include "GameScene.h"
+#include "SpriteFactory.h"
 
 Scene* GameScene::createScene()
 {
@@ -33,6 +27,11 @@ void GameScene::initData()
     auto mapBg = Sprite::create(s_MainBackgroundResourceId);
     mapBg->setPosition(Point(visibleSize.width * .5 + origin.x, visibleSize.height * .5 + origin.y));
     this->addChild(mapBg);
+    
+    m_Score = LabelTTF::create(String::createWithFormat("%d", 0)->getCString(), "Arial", 32);
+    m_Score->setColor(Color3B(255, 0, 0));
+    m_Score->setPosition(Point(origin.x + 30, visibleSize.height + origin.y - 30));
+    this->addChild(m_Score);
 
     auto listener = EventListenerTouch::create(Touch::DispatchMode::ONE_BY_ONE);
     listener->onTouchBegan = CC_CALLBACK_2(GameScene::onTouchBegan, this);
@@ -47,9 +46,7 @@ void GameScene::initData()
     for (int i=0; i< kBoxWidth; i++) {
         for (int j=0; j< kBoxHeight; j++) {
             GameTile* tile = m_box->objectAtXandY(i, j);
-            String* name = String::createWithFormat("%d.png", tile->value);
-            Sprite* sprite = Sprite::create(name->getCString());
-            sprite->setPosition(Point(kStartX + i * kTileSize + kTileSize * .5, kStartY + j * kTileSize + kTileSize * .5));
+            Sprite* sprite = SpriteFactory::getInstance()->create(tile->value, kStartX + i * kTileSize + kTileSize * .5, kStartY + j * kTileSize + kTileSize * .5);
             tile->sprite = sprite;
             this->addChild(sprite);
         }
@@ -67,7 +64,6 @@ void GameScene::onEnterTransitionDidFinish()
     listener->onTouchEnded = CC_CALLBACK_2(GameScene::onTouchEnded, this);
     
     EventDispatcher::getInstance()->addEventListenerWithSceneGraphPriority(listener, this);
-    
     m_box->check();
 }
 
@@ -126,6 +122,8 @@ void GameScene::checkSenderandData(Node* sender,void* data)
 	bool result = m_box->check();
 	if (result){
         m_box->setLock(false);
+        String* score = String::createWithFormat("%d", m_box->getClearSpriteNum() * kSpriteScorePer);
+        m_Score->setString(score->getCString());
     }else{
         changeWithTileABandSel((GameTile*)data, m_firstOne, callfuncND_selector(GameScene::backcheckSenderandData));
 	}
@@ -148,8 +146,8 @@ void GameScene::afterOneShineTrun(Node* sender)
     if(m_selectedTile && asprite == m_selectedTile->sprite){
         Sprite* sprite = asprite;
         FiniteTimeAction* someAction =
-        Sequence::create(ScaleTo::create(kMoveTileTime, 0.5f),
-                           ScaleTo::create(kMoveTileTime, 1.0f),
+        Sequence::create(ScaleTo::create(kMoveTileTime, 0.5f * kSpriteScale),
+                           ScaleTo::create(kMoveTileTime, 1.0f * kSpriteScale),
                            CallFuncN::create(CC_CALLBACK_1(GameScene::afterOneShineTrun, this)),
                            NULL);
         sprite->runAction(someAction);

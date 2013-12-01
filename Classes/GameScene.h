@@ -38,6 +38,7 @@ private:
 	GameBox* m_box;
 	GameTile* m_selectedTile;
 	GameTile* m_firstOne;
+    LabelTTF* m_Score;
 private:
     void initData();
     void operationTile(Point touchPos);

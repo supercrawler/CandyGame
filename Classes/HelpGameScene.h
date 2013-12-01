@@ -18,6 +18,9 @@ public:
 
     // implement the "static node()" method manually
     CREATE_FUNC(HelpGameScene);
+
+    virtual void onEnter() override;
+    virtual void onExit() override;
 };
 
 #endif

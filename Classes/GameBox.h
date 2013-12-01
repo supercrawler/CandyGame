@@ -18,18 +18,7 @@ class GameBox: public Node
 {
 public:
     Layer* layer;
-    
-private:
-    bool m_lock;
-    GameTile* m_firstTile;
-    GameTile* m_secondTile;
-    Size m_size;
-    Array* m_content;
-    Array* m_readyToRemoveTiles;
-    GameTile* m_outBorderTile;
-    
-public:
-	GameBox(Size asize);
+    GameBox(Size asize);
     GameTile* objectAtXandY(int posX,int posY);
     void useCombo(int posX, int posY, int comboValue);
     void checkWith(Orientation orient);
@@ -39,9 +28,21 @@ public:
     bool haveMore();
     int repair();
     int repairSingleColumn(int columnIndex);
-    
+    int getClearSpriteNum();
+    void removeScoreLabelCallback(Node* sender);
+
     inline void setLock(bool lock){m_lock = lock;}
     inline bool isLocked(){return m_lock;}
+
+private:
+    bool m_lock;
+    GameTile* m_firstTile;
+    GameTile* m_secondTile;
+    Size m_size;
+    Array* m_content;
+    Array* m_readyToRemoveTiles;
+    GameTile* m_outBorderTile;
+    int mClearSpriteNum;
 };
 
 #endif /* defined(__HelloCpp__GameBox__) */
